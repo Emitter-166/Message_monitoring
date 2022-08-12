@@ -19,7 +19,8 @@ public class setup extends ListenerAdapter {
         String serverId = e.getGuild().getId();
         switch (name){
             case "help":
-                e.getInteraction().replyEmbeds(new EmbedBuilder()
+                e.deferReply().queue();
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
                                 .setTitle("Commands for Message monitor")
                                 .setColor(Color.WHITE)
                                 .addField("Normal commands",
@@ -36,8 +37,9 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "summary-channel":
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                                     .setTitle("You can't do that!!")
                                     .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
@@ -50,7 +52,7 @@ public class setup extends ListenerAdapter {
                 }else{
                     summary_channel = e.getChannel().getId();
                 }
-                e.getInteraction().replyEmbeds(new EmbedBuilder()
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("Summary channel set!")
                         .setDescription("`summary channel set:` " + "<#" + summary_channel + ">")
                         .build()).queue();
@@ -63,15 +65,16 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "role-to-mention":
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("You can't do that!!")
                             .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
                     return;
                 }
                 String role_to_mention = e.getOption("role").getAsRole().getId();
-                e.getInteraction().replyEmbeds(new EmbedBuilder()
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("Summary ping role set!")
                         .setDescription("`Summary ping role:` " + "<@&" + role_to_mention + ">" )
                         .build()).queue();
@@ -83,9 +86,9 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "mainchat":
-
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("You can't do that!!")
                             .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
@@ -99,7 +102,7 @@ public class setup extends ListenerAdapter {
                 }else{
                     mainchat = e.getChannel().getId();
                 }
-                e.getInteraction().replyEmbeds(new EmbedBuilder()
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("Main chat set!")
                         .setDescription(String.format("`Main chat:` <#%s>", mainchat))
                         .build()).queue();
@@ -111,15 +114,16 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "reset-every-day":
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("You can't do that!!")
                             .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
                     return;
                 }
                 boolean reset = e.getOption("reset").getAsBoolean();
-                 e.getInteraction().replyEmbeds(new EmbedBuilder()
+                 e.getHook().sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("Reset everyday set!")
                         .setDescription("**reset everyday:** `" + reset + "`")
                         .build()).queue();
@@ -131,8 +135,9 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "reset":
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("You can't do that!!")
                             .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
@@ -140,29 +145,30 @@ public class setup extends ListenerAdapter {
                 }
 
                 if(e.getOption("channel") == null){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("Resetting leaderboard..")
                             .build()).queue();
-                    Thread thread = new Thread(new clearLeaderboard(serverId));
+                    Thread thread = new Thread(new clearLeaderboard(serverId, database));
                     thread.start();
                 }else{
                     String channelId = e.getOption("channel").getAsGuildChannel().getId();
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("Resetting leaderboard for " +  e.getOption("channel").getAsGuildChannel().getName() )
                             .build()).queue();
-                    Thread thread = new Thread(new clearOneLeaderboard(channelId, serverId));
+                    Thread thread = new Thread(new clearOneLeaderboard(channelId, serverId, database));
                     thread.start();
                 }
                 break;
 
             case "leaderboard":
+                e.deferReply().queue();
                 String channelId = e.getOption("channel").getAsGuildChannel().getId();
-                sendLeaderboard sendLeaderboard = new sendLeaderboard(channelId, serverId);
+                sendLeaderboard sendLeaderboard = new sendLeaderboard(channelId, serverId, database);
                 Thread thread = new Thread(sendLeaderboard);
                 thread.start();
 
                 try {
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                                     .setTitle("Message Leaderboard")
                                     .setDescription(String.format("**Leaderboard for** <#%s> \n", channelId))
                                     .appendDescription(sendLeaderboard.getLeaderboard())
@@ -174,6 +180,7 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "messages":
+                e.deferReply().queue();
                 String message_channel = e.getOption("channel").getAsGuildChannel().getId();
                 if(e.getOption("user") == null){
                     String userId = e.getMember().getId();
@@ -183,7 +190,7 @@ public class setup extends ListenerAdapter {
                     } catch (Exception ex) {
                         messages = 0;
                     }
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                                     .setTitle("total messages")
                                     .setDescription(String.format("**You have a total of** `%s` **messages on** <#%s>", messages, message_channel))
                                     .build())
@@ -194,7 +201,7 @@ public class setup extends ListenerAdapter {
                     try {
                         messages = (int) database.get(userId, "userId").get(message_channel);
                     } catch (Exception exception){}
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                                     .setTitle("total messages")
                                     .setDescription(String.format("<@%s> **have a total of** `%s` **messages on** <#%s>", userId, messages, message_channel))
                                     .build())
@@ -203,8 +210,9 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "reset-on":
+                e.deferReply().queue();
                 if(!e.getMember().hasPermission(permission)){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("You can't do that!!")
                             .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
                             .build()).queue();
@@ -212,13 +220,13 @@ public class setup extends ListenerAdapter {
                 }
                 String time = e.getOption("reset").getAsString();
                 if(time.length() != 2){
-                    e.getInteraction().replyEmbeds(new EmbedBuilder()
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("Wrong usage!!")
                             .setDescription("**Must be 2 digits (hour), 24 hour formatted EST time.**")
                             .build()).queue();
                     break;
                 }
-                e.getInteraction().replyEmbeds(new EmbedBuilder()
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("Reset time set!")
                         .setDescription("**reset time:** `" + time + "` est")
                         .build()).queue();

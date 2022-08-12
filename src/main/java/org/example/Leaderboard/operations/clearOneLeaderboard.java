@@ -5,14 +5,15 @@ import org.example.Database;
 import static org.example.Leaderboard.inputListeners.counter_thread.counterRunning;
 
 public class clearOneLeaderboard implements Runnable{
-    public clearOneLeaderboard(String channelId, String serverId) {
+    public clearOneLeaderboard(String channelId, String serverId, Database database) {
         this.channelId = channelId;
         this.serverId = serverId;
+        this.database = database;
     }
 
     String channelId;
     String serverId;
-    Database database = new Database();
+    Database database;
     @Override
     public void run() {
         try {

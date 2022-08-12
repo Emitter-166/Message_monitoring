@@ -9,15 +9,13 @@ import com.mongodb.client.model.Filters;
  import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 public class Database extends ListenerAdapter {
-    public MongoCollection<Document> collection;
-    public MongoDatabase database;
-    public String collectionName  = "messages";
-    public Database() {
+    public static MongoCollection<Document> collection;
+    public static MongoDatabase database;
+    public static String collectionName  = "messages";
+    public static void connect() {
         String uri = tokens.uri; //Mongo DB uri
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
@@ -50,9 +48,6 @@ public class Database extends ListenerAdapter {
         collection.drop();
         database.createCollection(collectionName);
         collection = database.getCollection(collectionName);
-//        for (Document index : Indexes) {
-//            collection.createIndex(index);
-//        }
     }
     private void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
@@ -64,7 +59,11 @@ public class Database extends ListenerAdapter {
                 .append("channels", "")
                 .append("users", "")
                 .append("summarySent", false)
-                .append("reset-on", "00");
+                .append("reset-on", "00")
+                .append("roleToAdd", "")
+                .append("previousWinner", "");
+
+
         collection.insertOne(document);
 
     }

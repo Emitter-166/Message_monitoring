@@ -12,12 +12,17 @@ import javax.security.auth.login.LoginException;
 public class Main {
     public static JDA jda;
     public static void main(String[] args) throws LoginException, InterruptedException {
+        Database.connect();
+        Thread reset_checker = new Thread(new resetting());
+        reset_checker.start();
+
         jda = JDABuilder.createLight(tokens.token)
                 .addEventListeners(new counter())
                 .addEventListeners(new setup())
                 .build().awaitReady();
-        Thread reset_checker = new Thread(new resetting());
-        reset_checker.start();
+
+
+
 
         String serverId = tokens.server_id;
         jda.getGuildById(serverId).upsertCommand("help", "commands for message monitoring").queue();
@@ -46,5 +51,8 @@ public class Main {
 
         jda.getGuildById(serverId).upsertCommand("reset-on", "set when to reset automatically and send a summary")
                 .addOption(OptionType.STRING, "reset", "24 hour format, first 2 digits(hours), est time", true).queue();
+
+        jda.getGuildById(serverId).upsertCommand("role-to-give", "which role to give to the top chatter")
+                .addOption(OptionType.ROLE, "role-to-add", "role to add to the top chatter of the day", true).queue();
     }
 }

@@ -6,11 +6,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 public class sendLeaderboard implements Runnable{
-    Database database = new Database();
+    Database database;
     StringBuilder leaderboard;
     String channelId;
     String serverId;
-    public sendLeaderboard(String channelId, String serverId) {
+    public sendLeaderboard(String channelId, String serverId, Database database) {
+        this.database = database;
         this.channelId = channelId;
         this.serverId = serverId;
         latch = new CountDownLatch(1);
@@ -49,7 +50,7 @@ public class sendLeaderboard implements Runnable{
         Map.Entry<String, Integer> entry;
 
         for(int i = 0; i < sorted.size(); i++){
-            if(i > 15){
+            if(i > 19){
                 break;
             }
             entry =  sorted.get(i);
@@ -57,4 +58,11 @@ public class sendLeaderboard implements Runnable{
         }
         latch.countDown();
     }
+
+    public static void main(String[] args) {
+       String s = "`%s.` <@%s> - `%s` messages \n" + "`%s.` <@%s> - `%s` messages \n" ;
+       String id = s.split("\n")[0].split("-")[0].split("`%s.`")[1].replace("<@", "").replace("> ", "");
+        System.out.println(id);
+    }
+
 }

@@ -6,8 +6,9 @@ import static org.example.Leaderboard.inputListeners.counter_thread.counterRunni
 public class clearLeaderboard implements Runnable{
     String serverId;
     public static boolean cleanerRunning;
-    static Database database = new Database();
-    public clearLeaderboard(String serverId) {
+    Database database;
+    public clearLeaderboard(String serverId, Database database) {
+        this.database = database;
         cleanerRunning = true;
         this.serverId = serverId;
     }
