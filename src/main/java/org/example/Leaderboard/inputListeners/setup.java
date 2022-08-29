@@ -236,7 +236,26 @@ public class setup extends ListenerAdapter {
                     throw new RuntimeException(ex);
                 }
                 break;
-
+            case "role-to-give":
+                e.deferReply().queue();
+                if(!e.getMember().hasPermission(permission)){
+                    e.getHook().sendMessageEmbeds(new EmbedBuilder()
+                            .setTitle("You can't do that!!")
+                            .setDescription("**You must have** `" + permission.getName() + "` **permission to do that!**")
+                            .build()).queue();
+                    return;
+                }
+                String role_to_add = e.getOption("role-to-add").getAsRole().getId();
+                e.getHook().sendMessageEmbeds(new EmbedBuilder()
+                        .setTitle("To add role set!")
+                        .setDescription("`To add role:` " + "<@&" + role_to_add + ">" )
+                        .build()).queue();
+                try {
+                    database.set(serverId, "serverId", "roleToAdd", role_to_add , false);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                break;
         }
     }
 }

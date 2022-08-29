@@ -43,11 +43,19 @@ public class Database extends ListenerAdapter {
 
     }
 
-    public void drop(){
+    public void drop() throws InterruptedException {
         ListIndexesIterable<Document> Indexes = collection.listIndexes();
         collection.drop();
-        database.createCollection(collectionName);
+        try{
+            database.createCollection(collectionName);
+        }catch (Exception ignored){}
+        Thread.sleep(100);
         collection = database.getCollection(collectionName);
+        for(Bson Index : Indexes){
+            try{
+                collection.createIndex(Index);
+            }catch (Exception ignored){}
+        }
     }
     private void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection

@@ -12,6 +12,7 @@ import javax.security.auth.login.LoginException;
 public class Main {
     public static JDA jda;
     public static void main(String[] args) throws LoginException, InterruptedException {
+
         Database.connect();
         Thread reset_checker = new Thread(new resetting());
         reset_checker.start();
@@ -55,4 +56,5 @@ public class Main {
         jda.getGuildById(serverId).upsertCommand("role-to-give", "which role to give to the top chatter")
                 .addOption(OptionType.ROLE, "role-to-add", "role to add to the top chatter of the day", true).queue();
     }
+
 }

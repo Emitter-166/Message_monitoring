@@ -34,8 +34,12 @@ public class clearLeaderboard implements Runnable{
         serverConfig.put("channels", "");
         serverConfig.put("users", "");
 
-        database.drop();
-        database.collection.insertOne(serverConfig);
+        try {
+            database.drop();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Database.collection.insertOne(serverConfig);
         cleanerRunning = false;
     }
 
